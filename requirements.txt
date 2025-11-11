@@ -1,0 +1,20 @@
+# Sistema de Batalha de Seguidores do Instagram
+# Requisitos principais
+
+# Computação numérica e otimização
+numpy>=1.24.0
+numba>=0.57.0
+
+# Processamento de vídeo e imagem
+opencv-python>=4.8.0
+moviepy>=1.0.3
+Pillow>=10.0.0
+
+# Instagram API
+instagrapi>=1.16.0
+
+# Requisições HTTP
+requests>=2.31.0
+
+# Utilidades
+tqdm>=4.66.0
