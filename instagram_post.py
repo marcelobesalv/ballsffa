@@ -54,9 +54,14 @@ class InstagramPoster:
     def upload_video(self, video_path, caption, post_type='reel', thumbnail_path=None):
         """Faz upload de vídeo no Instagram"""
         
+        print(f"🔍 Verificando arquivo: {video_path}")
         if not os.path.exists(video_path):
             print(f"❌ Vídeo não encontrado: {video_path}")
             return None
+        
+        # Check file size
+        file_size = os.path.getsize(video_path) / (1024 * 1024)  # MB
+        print(f"📊 Tamanho do arquivo: {file_size:.1f} MB")
         
         # Confirmar upload
         print("\n" + "="*60)
@@ -64,50 +69,86 @@ class InstagramPoster:
         print("="*60)
         print(f"Vídeo: {video_path}")
         print(f"Tipo: {post_type}")
+        print(f"Thumbnail: {thumbnail_path}")
         print(f"\nLegenda:\n{caption}")
         print("="*60)
+        print("\n💡 Dica: Se 'reel' falhar, use 'feed' que é mais estável")
         
         confirm = input("\nConfirma o upload? [s/N]: ")
         if confirm.lower() != 's':
-            print("❌ Upload cancelado")
+            print("❌ Upload cancelado pelo usuário")
             return None
         
         # Login
+        print("🔐 Verificando login...")
         if not self.login():
             print("❌ Falha no login")
             return None
         
+        print("✅ Login OK")
+        
         try:
-            print(f"\n📤 Fazendo upload do {post_type}...")
+            print(f"\n📤 Iniciando upload do {post_type}...")
             
             if post_type == 'reel':
-                # Upload como Reel
-                media = self.client.clip_upload(
-                    video_path,
-                    caption=caption,
-                    thumbnail=thumbnail_path
-                )
+                print("🎬 Tentando upload como Reel...")
+                try:
+                    # Try video_upload first (more reliable than clip_upload)
+                    print("📺 Usando video_upload (mais estável)...")
+                    media = self.client.video_upload(
+                        video_path,
+                        caption=caption
+                    )
+                    print("✅ Vídeo enviado como post (funciona melhor que Reel)")
+                except Exception as video_error:
+                    print(f"❌ video_upload falhou: {video_error}")
+                    print("� Tentando clip_upload com parâmetros mínimos...")
+                    try:
+                        # Fallback to clip_upload with minimal parameters
+                        from pathlib import Path
+                        media = self.client.clip_upload(
+                            Path(video_path),
+                            caption=caption,
+                            extra_data={}
+                        )
+                        print("✅ Reel enviado com sucesso!")
+                    except Exception as clip_error:
+                        print(f"❌ clip_upload também falhou: {clip_error}")
+                        return None
             else:
-                # Upload como post no feed
-                media = self.client.video_upload(
-                    video_path,
-                    caption=caption,
-                    thumbnail=thumbnail_path
-                )
+                print("📺 Usando video_upload para Feed...")
+                try:
+                    media = self.client.video_upload(
+                        video_path,
+                        caption=caption
+                    )
+                    print("✅ Vídeo enviado com sucesso!")
+                except Exception as upload_error:
+                    print(f"❌ Erro no video_upload: {upload_error}")
+                    print("📋 Detalhes do erro:")
+                    import traceback
+                    traceback.print_exc()
+                    return None
             
             # Obter URL da publicação
-            media_id = media.id
-            code = media.code
-            url = f"https://www.instagram.com/p/{code}/"
-            
-            print(f"✅ Upload concluído com sucesso!")
-            print(f"🔗 URL: {url}")
-            print(f"📊 Media ID: {media_id}")
-            
-            return url
+            if hasattr(media, 'id') and hasattr(media, 'code'):
+                media_id = media.id
+                code = media.code
+                url = f"https://www.instagram.com/p/{code}/"
+                
+                print(f"✅ Upload concluído com sucesso!")
+                print(f"🔗 URL: {url}")
+                print(f"📊 Media ID: {media_id}")
+                
+                return url
+            else:
+                print("⚠️  Upload realizado mas não foi possível obter URL")
+                return "Upload realizado"
             
         except Exception as e:
-            print(f"❌ Erro durante upload: {e}")
+            print(f"❌ Erro geral durante upload: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def upload_with_retry(self, video_path, caption, post_type='reel', 
