@@ -1,35 +1,31 @@
-# instagram-battle
+# 🎮 Balls FFA - Battle Royale dos Seguidores
 
-Estrutura do projeto criada como esqueleto. Cole seus códigos nos arquivos correspondentes.
+Um jogo onde seus seguidores do Instagram lutam entre si como bolas em uma arena até sobrar apenas um vencedor!
 
-Árvore do projeto:
+## 🎯 Como Funciona
 
-instagram-battle/
-│
-├── main.py                 # Orquestrador principal
-├── instagram_fetch.py      # Coleta de seguidores
-├── simulation_engine.py    # Motor de física
-├── renderer.py             # Renderização de vídeo
-├── video_export.py         # Exportação final
-├── instagram_post.py       # Upload automático
-│
-├── assets/
-│   └── pfps/              # Fotos de perfil (cache)
-├── data/
-│   ├── followers.json     # Cache de seguidores
-│   └── session.json       # Sessão do Instagram
-├── output/
-│   └── *.mp4              # Vídeos gerados
-│
-├── requirements.txt
-└── README.md
+1. **Coleta** os seguidores da sua conta do Instagram
+2. **Transforma** cada seguidor em uma bola colorida com sua foto de perfil  
+3. **Simula** uma batalha física onde as bolas colidem e se danificam
+4. **Gera** um vídeo da batalha completa até restar apenas 1 vencedor
 
-O que fazer agora:
+## 🚀 Como Usar
 
-- Substitua os placeholders nos arquivos .py pelos seus códigos.
-- Adicione dependências reais em `requirements.txt` e instale via pip.
-- Execute `python main.py` para rodar o orquestrador (quando implementado).
+```bash
+# Instalar dependências
+pip install -r requirements.txt
 
-Observações:
-- Os arquivos `data/*.json` estão vazios; o seu código de coleta deve gravá-los.
-- Os diretórios `assets/pfps` e `output` foram criados para cache e saída.
+# Rodar com dados reais (precisa fazer login no Instagram)
+python main.py --max-participants 100
+
+# Testar com dados fake
+python main.py --demo --max-participants 50
+```
+
+## ⚙️ Física do Jogo
+
+- Bolas **ricocheteiam** pela arena constantemente
+- **Colisões** causam dano baseado em velocidade e tamanho
+- Bolas **crescem** quando matam outras (ficam mais fortes)
+- **Sobreviventes** ficam mais rápidos conforme crescem
+- Último sobrevivente é o **vencedor**! 🏆
